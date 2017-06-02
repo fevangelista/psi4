@@ -40,4 +40,4 @@ lccd_pdm_3index_intr.cc   lccd_t2_amps.cc
 # arrays.cc olddf.cc t2_1st_scs_gen.cc t2_1st_scs_sc.cc z_vector_cg.cc
 # combine_ref_sep_tpdm.cc conv_mo_tei_ref.cc
 )
-psi4_add_module(bin dfocc sources_list mints diis)
+#psi4_add_module(bin dfocc sources_list mints diis)
