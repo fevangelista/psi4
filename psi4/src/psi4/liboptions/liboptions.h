@@ -413,18 +413,21 @@ public:
     void add(std::string key, DataType *data);
     void add(std::string key, bool b);
     void add(std::string key, int i);
+    void add(std::string key, rational r);
     void add(std::string key, double d);
     void add(std::string key, std::string s, std::string c = "");
     void add_i(std::string key, std::string s, std::string c = "");
 
     void add_bool(std::string key, bool b);
     void add_int(std::string key, int i);
+    void add_rational(std::string key, rational r);
     void add_double(std::string key, double d);
     void add_str(std::string key, std::string s, std::string c = "");
     void add_str_i(std::string key, std::string s, std::string c = "");
     void add_array(std::string key);
     void set_bool(const std::string &module, const std::string &key, bool b);
     void set_int(const std::string &module, const std::string &key, int i);
+    void set_rational(const std::string &module, const std::string &key, rational r);
     void set_double(const std::string & module, const std::string &key, double d);
     void set_str(const std::string & module, const std::string &key, std::string s);
     void set_str_i(const std::string & module, const std::string &key, std::string s);
@@ -433,6 +436,7 @@ public:
 
     void set_global_bool(const std::string &key, bool b);
     void set_global_int(const std::string &key, int i);
+    void set_global_rational(const std::string &key, rational r);
     void set_global_double(const std::string &key, double d);
     void set_global_str(const std::string &key, const std::string &s);
     void set_global_python(const std::string& key, const py::object &p);
@@ -442,11 +446,13 @@ public:
     void set_global_array_double(std::string key, double val, DataType *entry);
     void set_global_array_string(std::string key, std::string val, DataType *entry);
     void set_global_array_int(std::string key, int val, DataType *entry);
+    void set_global_array_rational(std::string key, rational val, DataType *entry);
     DataType* set_global_array_array(std::string key, DataType *entry);
     DataType* set_local_array_entry(const std::string &module, const std::string& key, DataType* entry, DataType* loc);
     void set_local_array_double(const std::string &module, const std::string &key, double val, DataType *entry);
     void set_local_array_string(const std::string &module, const std::string &key, std::string val, DataType *entry);
     void set_local_array_int(const std::string &module, const std::string &key, int val, DataType *entry);
+    void set_local_array_rational(const std::string &module, const std::string &key, rational val, DataType *entry);
     DataType* set_local_array_array(const std::string &module, const std::string &key, DataType *entry);
 
     void clear(void);
@@ -470,6 +476,7 @@ public:
 
     bool get_bool(std::string key);
     int get_int(std::string key);
+    rational get_rational(std::string key);
     double get_double(std::string key);
     std::string get_str(std::string key);
     int* get_int_array(std::string key);
