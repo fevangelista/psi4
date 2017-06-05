@@ -329,6 +329,60 @@ void IntDataType::assign(std::string s)
     assign(static_cast<int>(std::strtod(s.c_str(), NULL)));
 }
 
+// RatDataType
+RatDataType::RatDataType()
+    : DataType(), r_(0)
+{ }
+
+RatDataType::RatDataType(rational r)
+    : DataType(), r_(r)
+{ }
+
+RatDataType::~RatDataType()
+{ }
+
+std::string RatDataType::type() const
+{
+    return std::string("rational");
+}
+
+std::string RatDataType::to_string() const
+{
+    return r_.str();
+}
+
+int RatDataType::to_integer() const
+{
+    return to_double(); // cast double to int
+}
+
+double RatDataType::to_double() const
+{
+    return static_cast<double>(r_.numerator()) / static_cast<double>(r_.denominator());
+}
+
+void RatDataType::assign(bool b)
+{
+    assign(static_cast<int>(b));
+}
+
+void RatDataType::assign(int i)
+{
+    changed();
+    r_.numerator(i);
+    r_.denominator(1);
+}
+
+void RatDataType::assign(double d)
+{
+    assign(static_cast<int>(d));
+}
+
+void RatDataType::assign(std::string s)
+{
+    assign(static_cast<int>(std::strtod(s.c_str(), NULL)));
+}
+
 // DoubleDataType
 DoubleDataType::DoubleDataType()
     : DataType(), double_(0.0)

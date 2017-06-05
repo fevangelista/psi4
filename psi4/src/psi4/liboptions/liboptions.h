@@ -40,6 +40,7 @@
 #undef _XOPEN_SOURCE
 #endif
 
+#include "rational.h"
 #include "psi4/libpsi4util/exception.h"
 #include "psi4/libpsi4util/libpsi4util.h" // Needed for Ref counting, string splitting, and conversions
 #include "psi4/libpsi4util/ref.h" // Needed for Ref counting, string splitting, and conversions
@@ -157,6 +158,26 @@ public:
     IntDataType();
     IntDataType(int i);
     virtual ~IntDataType();
+
+    virtual std::string type() const;
+
+    virtual std::string to_string() const;
+    virtual int to_integer() const;
+    virtual double to_double() const;
+
+    virtual void assign(bool b);
+    virtual void assign(int i);
+    virtual void assign(double d);
+    virtual void assign(std::string s);
+};
+
+class RatDataType : public DataType
+{
+    rational r_;
+public:
+    RatDataType();
+    RatDataType(rational r);
+    virtual ~RatDataType();
 
     virtual std::string type() const;
 
