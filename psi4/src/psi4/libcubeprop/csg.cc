@@ -232,6 +232,8 @@ void CubicScalarGrid::write_gen_file(double* v, const std::string& name, const s
                                      const std::string& comment) {
     if (type == "CUBE") {
         write_cube_file(v, name, comment);
+    } else if (type == "COMPRESSED_CUBE") {
+        write_cube_file(v, name, comment);
     } else {
         throw PSIEXCEPTION("CubicScalarGrid: Unrecognized output file type");
     }
@@ -295,6 +297,74 @@ void CubicScalarGrid::write_cube_file(double* v, const std::string& name, const 
     for (size_t ind = 0; ind < npoints_; ind++) {
         fprintf(fh, "%12.5E ", v2[ind]);
         if (ind % 6 == 5) fprintf(fh, "\n");
+    }
+
+    fclose(fh);
+}
+void CubicScalarGrid::write_compressed_cube_file(double* v, const std::string& name, const std::string& comment,
+                                                 double threshold) {
+    // => Reorder the grid <= //
+
+    double* v2 = new double[npoints_];
+    size_t offset = 0L;
+    for (int istart = 0L; istart <= N_[0]; istart += nxyz_) {
+        int ni = (istart + nxyz_ > N_[0] ? (N_[0] + 1) - istart : nxyz_);
+        for (int jstart = 0L; jstart <= N_[1]; jstart += nxyz_) {
+            int nj = (jstart + nxyz_ > N_[1] ? (N_[1] + 1) - jstart : nxyz_);
+            for (int kstart = 0L; kstart <= N_[2]; kstart += nxyz_) {
+                int nk = (kstart + nxyz_ > N_[2] ? (N_[2] + 1) - kstart : nxyz_);
+                for (int i = istart; i < istart + ni; i++) {
+                    for (int j = jstart; j < jstart + nj; j++) {
+                        for (int k = kstart; k < kstart + nk; k++) {
+                            size_t index = i * (N_[1] + 1L) * (N_[2] + 1L) + j * (N_[2] + 1L) + k;
+                            v2[index] = v[offset];
+                            offset++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // => Drop the grid out <= //
+
+    std::stringstream ss;
+    ss << filepath_ << "/" << name << ".ccube";
+
+    // Is filepath a valid directory?
+    if (filesystem::path(filepath_).make_absolute().is_directory() == false) {
+        printf("Filepath \"%s\" is not valid.  Please create this directory.\n", filepath_.c_str());
+        outfile->Printf("Filepath \"%s\" is not valid.  Please create this directory.\n", filepath_.c_str());
+        exit(Failure);
+    }
+
+    FILE* fh = fopen(ss.str().c_str(), "w");
+    // Two comment lines
+    fprintf(fh, "Psi4 Gaussian Cube File.\n");
+    fprintf(fh, "Property: %s%s\n", name.c_str(), comment.c_str());
+
+    // Number of atoms plus origin of data
+    fprintf(fh, "%6d %10.6f %10.6f %10.6f\n", mol_->natom(), O_[0], O_[1], O_[2]);
+
+    // Number of points along axis, displacement along x,y,z
+    fprintf(fh, "%6d %10.6f %10.6f %10.6f\n", N_[0] + 1, D_[0], 0.0, 0.0);
+    fprintf(fh, "%6d %10.6f %10.6f %10.6f\n", N_[1] + 1, 0.0, D_[1], 0.0);
+    fprintf(fh, "%6d %10.6f %10.6f %10.6f\n", N_[2] + 1, 0.0, 0.0, D_[2]);
+
+    // Atoms of molecule (Z, Q?, x, y, z)
+    for (int A = 0; A < mol_->natom(); A++) {
+        fprintf(fh, "%3d %10.6f %10.6f %10.6f %10.6f\n", (int)mol_->true_atomic_number(A), 0.0, mol_->x(A), mol_->y(A),
+                mol_->z(A));
+    }
+
+    // Data, striped (x, y, z)
+    int nwritten = 0;
+    for (size_t ind = 0; ind < npoints_; ind++) {
+        if (std::fabs(v2[ind]) > threshold) {
+            fprintf(fh, "%zu %12.5E ", ind, v2[ind]);
+            if (nwritten % 6 == 5) fprintf(fh, "\n");
+            nwritten++;
+        }
     }
 
     fclose(fh);
@@ -665,17 +735,17 @@ void CubicScalarGrid::compute_difference(std::shared_ptr<Matrix> C, const std::v
     double* vp = v->pointer();
     add_orbitals(&v_tp[0], C2);
     for (int i = 0; i < npoints_; i++) {
-         if (square) {
-             v->set(0, i, (v_t->get(0,i) - v_t->get(1,i))*(v_t->get(0,i) + v_t->get(1,i)));
-         } else {
-             v->set(0, i, (v_t->get(0,i) - v_t->get(1,i)));
-         }
+        if (square) {
+            v->set(0, i, (v_t->get(0, i) - v_t->get(1, i)) * (v_t->get(0, i) + v_t->get(1, i)));
+        } else {
+            v->set(0, i, (v_t->get(0, i) - v_t->get(1, i)));
+        }
     }
     std::pair<double, double> isocontour_range = compute_isocontour_range(&vp[0], 2.0);
     double density_percent = 100.0 * options_.get_double("CUBEPROP_ISOCONTOUR_THRESHOLD");
     std::stringstream comment;
-    comment << ". Isocontour range for " << density_percent << "% of the density: (" << isocontour_range.first
-            << "," << isocontour_range.second << ")";
+    comment << ". Isocontour range for " << density_percent << "% of the density: (" << isocontour_range.first << ","
+            << isocontour_range.second << ")";
     // Write to disk
     write_gen_file(&vp[0], label, type, comment.str());
 }
@@ -734,12 +804,12 @@ std::string CubicScalarGrid::ecp_header() {
         std::stringstream ecp_ncore;
         for (int A = 0; A < mol_->natom(); A++) {
             if (primary_->n_ecp_core(mol_->label(A)) > 0) {
-                ecp_atoms << A+1 << "[" << mol_->symbol(A) << "], ";
+                ecp_atoms << A + 1 << "[" << mol_->symbol(A) << "], ";
                 ecp_ncore << primary_->n_ecp_core(mol_->label(A)) << ", ";
             }
         }
-        ecp_head << ecp_atoms.str().substr(0,ecp_atoms.str().length()-2) << ") electrons ("
-                 << ecp_ncore.str().substr(0,ecp_ncore.str().length()-2) << ").";
+        ecp_head << ecp_atoms.str().substr(0, ecp_atoms.str().length() - 2) << ") electrons ("
+                 << ecp_ncore.str().substr(0, ecp_ncore.str().length() - 2) << ").";
     }
     return ecp_head.str();
 }

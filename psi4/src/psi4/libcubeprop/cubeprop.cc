@@ -103,6 +103,7 @@ void CubeProperties::print_header() {
 void CubeProperties::raw_compute_properties() {
     print_header();
 
+    output_type_ = options_["CUBEPROP_FILETYPE"].to_string();
     for (size_t ind = 0; ind < options_["CUBEPROP_TASKS"].size(); ind++) {
         std::string task = options_["CUBEPROP_TASKS"][ind].to_string();
 
@@ -165,9 +166,9 @@ void CubeProperties::raw_compute_properties() {
             std::vector<std::string> labelsb;
             CharacterTable ct = basisset_->molecule()->point_group()->char_table();
             if (nalpha_ == nbeta_) {
-                indsa0.push_back(nalpha_-1);
-                labelsa.push_back(std::to_string(std::get<1>(info_a_[nalpha_-1]) + 1) + "-" +
-                                  ct.gamma(std::get<2>(info_a_[nalpha_-1])).symbol() + "_HOMO");
+                indsa0.push_back(nalpha_ - 1);
+                labelsa.push_back(std::to_string(std::get<1>(info_a_[nalpha_ - 1]) + 1) + "-" +
+                                  ct.gamma(std::get<2>(info_a_[nalpha_ - 1])).symbol() + "_HOMO");
                 indsa0.push_back(nalpha_);
                 labelsa.push_back(std::to_string(std::get<1>(info_a_[nalpha_]) + 1) + "-" +
                                   ct.gamma(std::get<2>(info_a_[nalpha_])).symbol() + "_LUMO");
@@ -183,7 +184,7 @@ void CubeProperties::raw_compute_properties() {
                     orb_index = nalpha_ - i;
                     indsa0.push_back(orb_index);
                     labelsa.push_back(std::to_string(std::get<1>(info_a_[orb_index]) + 1) + "-" +
-                                  ct.gamma(std::get<2>(info_a_[orb_index])).symbol() + "_SOMO");
+                                      ct.gamma(std::get<2>(info_a_[orb_index])).symbol() + "_SOMO");
                 }
                 orb_index = nbeta_ - 1;
                 indsa0.push_back(orb_index);
@@ -206,9 +207,9 @@ void CubeProperties::raw_compute_properties() {
                 throw PSIEXCEPTION(task + "is not implemented for open-shell systems");
             } else {
                 indsa0.push_back(nalpha_);
-                indsa0.push_back(nalpha_-1);
+                indsa0.push_back(nalpha_ - 1);
                 std::stringstream ss;
-                ss << "DUAL_" << (nalpha_+1) << "_LUMO-" << nalpha_ << "_HOMO";
+                ss << "DUAL_" << (nalpha_ + 1) << "_LUMO-" << nalpha_ << "_HOMO";
                 compute_difference(Ca_, indsa0, ss.str(), true);
             }
         } else if (task == "BASIS_FUNCTIONS") {
@@ -235,23 +236,23 @@ void CubeProperties::raw_compute_properties() {
     }
 }
 void CubeProperties::compute_density(std::shared_ptr<Matrix> D, const std::string& key) {
-    grid_->compute_density(D, key);
+    grid_->compute_density(D, key, output_type_);
 }
 void CubeProperties::compute_esp(std::shared_ptr<Matrix> Dt, const std::vector<double>& w) {
-    grid_->compute_density(Dt, "Dt");
-    grid_->compute_esp(Dt, w, "ESP");
+    grid_->compute_density(Dt, "Dt", output_type_);
+    grid_->compute_esp(Dt, w, "ESP", output_type_);
 }
 void CubeProperties::compute_orbitals(std::shared_ptr<Matrix> C, const std::vector<int>& indices,
                                       const std::vector<std::string>& labels, const std::string& key) {
-    grid_->compute_orbitals(C, indices, labels, key);
+    grid_->compute_orbitals(C, indices, labels, key, output_type_);
 }
 void CubeProperties::compute_difference(std::shared_ptr<Matrix> C, const std::vector<int>& indices,
-                                      const std::string& label, bool square) {
-    grid_->compute_difference(C, indices, label, square);
+                                        const std::string& label, bool square) {
+    grid_->compute_difference(C, indices, label, square, output_type_);
 }
 void CubeProperties::compute_basis_functions(const std::vector<int>& indices, const std::string& key) {
-    grid_->compute_basis_functions(indices, key);
+    grid_->compute_basis_functions(indices, key, output_type_);
 }
-void CubeProperties::compute_LOL(std::shared_ptr<Matrix> D, const std::string& key) { grid_->compute_LOL(D, key); }
-void CubeProperties::compute_ELF(std::shared_ptr<Matrix> D, const std::string& key) { grid_->compute_ELF(D, key); }
+void CubeProperties::compute_LOL(std::shared_ptr<Matrix> D, const std::string& key) { grid_->compute_LOL(D, key,output_type_); }
+void CubeProperties::compute_ELF(std::shared_ptr<Matrix> D, const std::string& key) { grid_->compute_ELF(D, key,output_type_); }
 }  // namespace psi

@@ -234,8 +234,13 @@ int read_options(const std::string &name, Options &options, bool suppress_printi
     /*- List of basis function indices for which cube files are generated
     (1-based). All basis functions computed if empty.-*/
     options.add("CUBEPROP_BASIS_FUNCTIONS", new ArrayType());
-    /*- Fraction of density captured by adaptive isocontour values -*/
+    /*- Fraction of density captured by adaptive isocontour values. -*/
     options.add_double("CUBEPROP_ISOCONTOUR_THRESHOLD", 0.85);
+    /*- The type of file generated. Valid options:
+        ``CUBE`` - Gaussian cube file;
+        ``COMPRESSED_CUBE`` - A compressed Gaussian cube file;
+    -*/
+    options.add_str("CUBEPROP_FILETYPE", "CUBE", "CUBE COMPRESSED_CUBE");
     /*- CubicScalarGrid basis cutoff. !expert -*/
     options.add_double("CUBIC_BASIS_TOLERANCE", 1.0E-12);
     /*- CubicScalarGrid maximum number of grid points per evaluation block. !expert -*/

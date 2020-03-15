@@ -154,6 +154,9 @@ class CubicScalarGrid {
     void write_gen_file(double* v, const std::string& name, const std::string& type, const std::string& comment = "");
     /// Write a Gaussian cube file of the scalar field v (in fast ordering) to filepath/name.cube
     void write_cube_file(double* v, const std::string& name, const std::string& comment = "");
+    /// Write a compressed Gaussian cube file of the scalar field v (in fast ordering) to filepath/name.cube
+    void write_compressed_cube_file(double* v, const std::string& name, const std::string& comment = "",
+                                    double threshold = 1.0e-6);
 
     // => Low-Level Scalar Field Computation (Use only if you know what you are doing) <= //
 
@@ -185,8 +188,8 @@ class CubicScalarGrid {
                           const std::vector<std::string>& labels, const std::string& name,
                           const std::string& type = "CUBE");
     /// Compute a set of orbital-type properties and drop files corresponding to name, index, symmetry label, and type
-    void compute_difference(std::shared_ptr<Matrix> C, const std::vector<int>& indices,
-                          const std::string& label, bool square = false, const std::string& type = "CUBE");
+    void compute_difference(std::shared_ptr<Matrix> C, const std::vector<int>& indices, const std::string& label,
+                            bool square = false, const std::string& type = "CUBE");
 
     /// Compute a LOL-type property and drop a file corresponding to name and type
     void compute_LOL(std::shared_ptr<Matrix> D, const std::string& name, const std::string& type = "CUBE");
