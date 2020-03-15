@@ -156,7 +156,7 @@ class CubicScalarGrid {
     void write_cube_file(double* v, const std::string& name, const std::string& comment = "");
     /// Write a compressed Gaussian cube file of the scalar field v (in fast ordering) to filepath/name.cube
     void write_compressed_cube_file(double* v, const std::string& name, const std::string& comment = "",
-                                    double threshold = 1.0e-6);
+                                    double threshold = 1.0e-4);
 
     // => Low-Level Scalar Field Computation (Use only if you know what you are doing) <= //
 

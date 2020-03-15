@@ -28,6 +28,8 @@
 
 #include "csg.h"
 
+#include <hdf5.h>
+
 #include <algorithm>
 #ifdef _OPENMP
 #include <omp.h>
@@ -233,7 +235,7 @@ void CubicScalarGrid::write_gen_file(double* v, const std::string& name, const s
     if (type == "CUBE") {
         write_cube_file(v, name, comment);
     } else if (type == "COMPRESSED_CUBE") {
-        write_cube_file(v, name, comment);
+        write_compressed_cube_file(v, name, comment);
     } else {
         throw PSIEXCEPTION("CubicScalarGrid: Unrecognized output file type");
     }
@@ -359,15 +361,36 @@ void CubicScalarGrid::write_compressed_cube_file(double* v, const std::string& n
 
     // Data, striped (x, y, z)
     int nwritten = 0;
+    int last_written = 0;
     for (size_t ind = 0; ind < npoints_; ind++) {
         if (std::fabs(v2[ind]) > threshold) {
-            fprintf(fh, "%zu %12.5E ", ind, v2[ind]);
-            if (nwritten % 6 == 5) fprintf(fh, "\n");
+            int delta = ind - last_written;
+            fprintf(fh, "%zu %.3f%s", delta, v2[ind] * 10000.0, ind == npoints_ - 1 ? "" : "\n");
+            //            if (nwritten % 6 == 5) fprintf(fh, "\n");
+            last_written = ind;
             nwritten++;
         }
     }
-
     fclose(fh);
+//    std::string filename = filepath_ + "/" + name + ".cubeh5";
+
+//    hid_t file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+//    hid_t group_id = H5Gcreate(file_id, "cube", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+//    std::stringstream storagename;
+//    storagename << "data";
+
+//    hsize_t dimarray = npoints_;
+//    hid_t dataspace_id = H5Screate_simple(1, &dimarray, NULL);
+//    hid_t dataset_id = H5Dcreate(group_id, storagename.str().c_str(), H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT,
+//                                 H5P_DEFAULT, H5P_DEFAULT);
+//    H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, v2);
+
+//    H5Dclose(dataset_id);
+//    H5Sclose(dataspace_id);
+
+//    H5Gclose(group_id);
+//    H5Fclose(file_id);
 }
 void CubicScalarGrid::add_density(double* v, std::shared_ptr<Matrix> D) {
     points_->set_pointers(D);
