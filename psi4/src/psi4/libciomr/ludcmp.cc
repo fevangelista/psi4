@@ -33,7 +33,7 @@
 
 namespace psi {
 
-void ludcmp(double** a,int n,int* indx,double* d)
+void PSI_API ludcmp(double** a,int n,int* indx,double* d)
    {
       int i,imax=0,j,k;
       double big,dum,sum,temp;

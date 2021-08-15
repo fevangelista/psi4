@@ -36,6 +36,7 @@
 
 #include "typedefs.h"
 #include "psi4/libmints/vector3.h"
+#include "psi4/pragma.h"
 
 namespace psi {
 
@@ -61,7 +62,7 @@ class BasisSet;
 *  wavefunction, substitutions may be made later, to use different orbitals
 *  or densities.
 */
-class Prop {
+class PSI_API Prop {
 
 protected:
     /// Print flag
@@ -230,7 +231,7 @@ public:
 * The OEProp object, computes arbitrary expectation values (scalars)
 * analyses (typically vectors)
 **/
-class OEProp : public Prop {
+class PSI_API OEProp : public Prop {
 
 protected:
     /// Common initialization

@@ -32,6 +32,7 @@
 #include <cstdio>
 #include <vector>
 #include "psi4/libmints/vector3.h"
+#include "psi4/pragma.h"
 
 namespace psi {
 
@@ -186,7 +187,7 @@ public:
  *  \class GaussianShell
  *  \brief Gaussian orbital shell.
  */
-class GaussianShell
+class PSI_API GaussianShell
 {
 protected:
     /// Angular momentum

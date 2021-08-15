@@ -121,7 +121,7 @@ public:
 
 };
 
-class NotImplementedException_ : public PsiException
+class PSI_API NotImplementedException_ : public PsiException
 {
 public:
     NotImplementedException_(const std::string &message,
@@ -156,7 +156,7 @@ public:
 /**
 * Exception for system errors. Those that report via errno
 */
-class SystemError : public PsiException
+class PSI_API SystemError : public PsiException
 {
 
 public:
@@ -178,7 +178,7 @@ public:
 /**
 * Exception for features that are not implemented yet, but will be (maybe?)
 */
-class FeatureNotImplemented : public PsiException
+class PSI_API FeatureNotImplemented : public PsiException
 {
 
 public:
@@ -204,7 +204,7 @@ public:
 * A generic template class for exceptions in which a min or max value is exceed
 */
 template<class T>
-class LimitExceeded : public PsiException
+class PSI_API LimitExceeded : public PsiException
 {
 
 private:
@@ -259,7 +259,7 @@ public:
 * Error in a step size
 */
 template<class T=double>
-class StepSizeError : public LimitExceeded<T>
+class PSI_API StepSizeError : public LimitExceeded<T>
 {
 
     typedef LimitExceeded<T> ParentClass;
@@ -287,7 +287,7 @@ public:
 * Maximum number of iterations exceeded
 */
 template<class T=int>
-class MaxIterationsExceeded : public LimitExceeded<T>
+class PSI_API MaxIterationsExceeded : public LimitExceeded<T>
 {
 
     typedef LimitExceeded<T> ParentClass;
@@ -314,7 +314,7 @@ public:
 * Convergence error for routines
 */
 template<class T=int>
-class ConvergenceError : public MaxIterationsExceeded<T>
+class PSI_API ConvergenceError : public MaxIterationsExceeded<T>
 {
 public:
     /**
@@ -355,7 +355,7 @@ private:
 * Convergence error for routines
 */
 template<class T=size_t>
-class ResourceAllocationError : public LimitExceeded<T>
+class PSI_API ResourceAllocationError : public LimitExceeded<T>
 {
 
 public:
@@ -379,7 +379,7 @@ public:
 /**
 * Exception on input values
 */
-class InputException : public PsiException
+class PSI_API InputException : public PsiException
 {
 
 private:

@@ -56,7 +56,7 @@ std::string to_lower_copy(const std::string &str);
 void to_upper(std::string &str);
 std::string to_upper_copy(const std::string &str);
 
-std::string to_string(const int val);
+std::string PSI_API to_string(const int val);
 
 std::string to_string(const double val);
 
